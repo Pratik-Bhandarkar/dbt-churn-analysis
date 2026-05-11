@@ -1,0 +1,115 @@
+version: 2
+
+models:
+  - name: stg_accounts
+    description: "One row per customer account. Cleaned and typed from raw_accounts. The foundation for all account-level analysis."
+    columns:
+      - name: account_id
+        description: "Primary key. Unique identifier for each account."
+        tests:
+          - unique
+          - not_null
+      - name: plan_type
+        description: "Current subscription plan."
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['free', 'starter', 'pro', 'enterprise']
+      - name: plan_rank
+        description: "Numeric rank of plan tier. free=0, starter=1, pro=2, enterprise=3."
+      - name: created_at
+        description: "Timestamp when the account was created."
+        tests:
+          - not_null
+
+  - name: stg_users
+    description: "One row per active user. Deleted users are filtered out at this layer."
+    columns:
+      - name: user_id
+        description: "Primary key. Unique identifier for each user."
+        tests:
+          - unique
+          - not_null
+      - name: account_id
+        description: "Foreign key to stg_accounts."
+        tests:
+          - not_null
+      - name: role
+        description: "User's role within their account."
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['admin', 'member', 'viewer']
+      - name: is_deleted
+        description: "Always false at this layer — deleted users are filtered in the where clause."
+        tests:
+          - not_null
+
+  - name: stg_events
+    description: "One row per product event. JSON properties parsed into typed columns."
+    columns:
+      - name: event_id
+        description: "Primary key. Unique identifier for each event."
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        description: "Foreign key to stg_users."
+        tests:
+          - not_null
+      - name: account_id
+        description: "Foreign key to stg_accounts."
+        tests:
+          - not_null
+      - name: event_type
+        description: "Type of product event."
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['page_view', 'feature_used']
+      - name: event_page
+        description: "Page visited. Populated for page_view events only."
+      - name: event_feature
+        description: "Feature used. Populated for feature_used events only."
+
+  - name: stg_subscriptions
+    description: "One row per subscription state change. Includes derived MRR change column."
+    columns:
+      - name: subscription_id
+        description: "Primary key."
+        tests:
+          - unique
+          - not_null
+      - name: account_id
+        description: "Foreign key to stg_accounts."
+        tests:
+          - not_null
+      - name: mrr_usd
+        description: "Monthly Recurring Revenue in USD at time of change."
+      - name: mrr_change_usd
+        description: "Signed MRR impact. Positive for upgrades, negative for downgrades and churns."
+      - name: change_reason
+        description: "Why the subscription changed."
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['new_signup', 'upgrade', 'downgrade', 'churn']
+
+  - name: stg_ai_signals
+    description: "One row per account. AI-generated health scores clamped to valid range of 0-1."
+    columns:
+      - name: account_id
+        description: "Primary key and foreign key to stg_accounts. One signal row per account."
+        tests:
+          - unique
+          - not_null
+      - name: churn_score
+        description: "Churn probability between 0 and 1. Clamped at staging layer."
+      - name: expansion_score
+        description: "Expansion probability between 0 and 1. Clamped at staging layer."
+      - name: ai_segment
+        description: "ML model assigned segment."
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['at_risk', 'healthy', 'champion', 'new']

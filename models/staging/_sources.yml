@@ -1,0 +1,79 @@
+version: 2
+
+sources:
+  - name: saasify_raw
+    description: "Raw source data loaded via dbt seeds. Represents the landing zone for all SaaSify operational data."
+    schema: main_raw
+
+    tables:
+      - name: raw_accounts
+        description: "One row per customer account. The master record for every company using SaaSify."
+        freshness:
+          warn_after: {count: 7, period: day}
+          error_after: {count: 30, period: day}
+        loaded_at_field: "cast(created_at as timestamp)"
+        columns:
+          - name: account_id
+            description: "Primary key. Unique identifier for each account."
+          - name: plan_type
+            description: "Current subscription plan. One of: free, starter, pro, enterprise."
+          - name: created_at
+            description: "Timestamp when the account was created."
+
+      - name: raw_users
+        description: "One row per user. Users belong to accounts."
+        freshness:
+          warn_after: {count: 7, period: day}
+          error_after: {count: 30, period: day}
+        loaded_at_field: "cast(created_at as timestamp)"
+        columns:
+          - name: user_id
+            description: "Primary key. Unique identifier for each user."
+          - name: account_id
+            description: "Foreign key to raw_accounts."
+          - name: is_deleted
+            description: "Soft delete flag. True means this user has been deactivated."
+
+      - name: raw_events
+        description: "One row per product event. High-volume table tracking all user interactions."
+        freshness:
+          warn_after: {count: 7, period: day}
+          error_after: {count: 30, period: day}
+        loaded_at_field: "cast(event_at as timestamp)"
+        columns:
+          - name: event_id
+            description: "Primary key."
+          - name: event_type
+            description: "Type of event, e.g. page_view, feature_used."
+          - name: properties
+            description: "JSON string containing event-specific metadata."
+
+      - name: raw_subscriptions
+        description: "One row per subscription state change — upgrades, downgrades, and churns."
+        freshness:
+          warn_after: {count: 7, period: day}
+          error_after: {count: 30, period: day}
+        loaded_at_field: "cast(changed_at as timestamp)"
+        columns:
+          - name: subscription_id
+            description: "Primary key."
+          - name: mrr_usd
+            description: "Monthly Recurring Revenue in USD at the time of this change."
+          - name: change_reason
+            description: "Why the subscription changed. One of: new_signup, upgrade, downgrade, churn."
+
+      - name: raw_ai_signals
+        description: "AI-generated account health scores. Refreshed daily by the ML pipeline."
+        freshness:
+          warn_after: {count: 7, period: day}
+          error_after: {count: 30, period: day}
+        loaded_at_field: "cast(scored_at as timestamp)"
+        columns:
+          - name: account_id
+            description: "Foreign key to raw_accounts. One score row per account."
+          - name: churn_score
+            description: "Probability of churn between 0 and 1. Higher = more at risk."
+          - name: expansion_score
+            description: "Probability of expansion between 0 and 1. Higher = more likely to upgrade."
+          - name: ai_segment
+            description: "Model-assigned segment. One of: at_risk, healthy, champion, new."

@@ -1,0 +1,57 @@
+name: 'saasify_analytics'
+version: '1.0.0'
+profile: 'saasify_analytics'
+
+config-version: 2
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+seeds:
+  saasify_analytics:
+    +schema: raw
+    raw_accounts:
+      +column_types:
+        account_id: varchar
+        employee_count: integer
+    raw_users:
+      +column_types:
+        user_id: varchar
+        account_id: varchar
+        is_deleted: boolean
+    raw_events:
+      +column_types:
+        event_id: varchar
+        user_id: varchar
+        account_id: varchar
+        properties: varchar
+    raw_subscriptions:
+      +column_types:
+        subscription_id: varchar
+        account_id: varchar
+        mrr_usd: integer
+    raw_ai_signals:
+      +column_types:
+        account_id: varchar
+        churn_score: double
+        expansion_score: double
+
+models:
+  saasify_analytics:
+    staging:
+      +materialized: view
+      +schema: staging
+    intermediate:
+      +materialized: view
+      +schema: intermediate
+    marts:
+      +materialized: table
+      +schema: marts

@@ -1,0 +1,22 @@
+# dbt artifacts
+target/
+dbt_packages/
+logs/
+
+# DuckDB database files
+*.duckdb
+*.duckdb.wal
+
+# Python virtual environment
+venv/
+
+# dbt credentials - NEVER commit this
+profiles.yml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python cache
+__pycache__/
+*.pyc
