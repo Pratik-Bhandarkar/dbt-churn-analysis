@@ -20,7 +20,7 @@ renamed as (
 
         -- numeric
         mrr_usd,
-
+        {{ cents_to_dollars('mrr_usd') }}   as mrr_dollars,
         -- derived
         case
             when change_reason = 'upgrade'   then mrr_usd

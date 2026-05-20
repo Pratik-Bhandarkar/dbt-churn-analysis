@@ -27,7 +27,10 @@ renamed as (
         -- derived
         datediff('day', 
             cast(last_login_at as timestamp), 
-            current_timestamp)              as days_since_last_login
+            current_timestamp)              as days_since_last_login,
+        {{ classify_engagement(
+            "datediff('day', cast(last_login_at as timestamp), current_timestamp)"
+        ) }} as engagement_tier
 
     from source
 
