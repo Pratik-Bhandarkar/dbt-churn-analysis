@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: fct_account_health
+    description: "One row per account combining product usage, subscription history, and AI-generated health scores. The single source of truth for account health analysis."
+    columns:
+      - name: account_id
+        description: "Primary key."
+        tests:
+          - unique
+          - not_null
+      - name: churn_score
+        description: "AI model churn probability between 0 and 1."
+      - name: expansion_score
+        description: "AI model expansion probability between 0 and 1."
+      - name: active_user_ratio
+        description: "Ratio of active users to total employees. Key adoption signal."
+      - name: ai_segment
+        description: "ML model assigned segment."
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['at_risk', 'healthy', 'champion', 'new']
+
+  - name: mart_churn_risk
+    description: "ML-ready feature table for churn prediction and sales prioritization. One row per account with composite risk scoring and recommended actions. Primary input for the Account Health Dashboard and LLM-generated outreach."
+    columns:
+      - name: account_id
+        description: "Primary key."
+        tests:
+          - unique
+          - not_null
+      - name: composite_risk_score
+        description: "Weighted risk score combining AI churn score (50%), inactivity signals (30%), and low adoption (20%). Range 0-1."
+      - name: recommended_action
+        description: "Sales action recommendation derived from risk signals."
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['urgent_outreach', 'expansion_opportunity', 'monitor_closely', 'healthy_no_action']
+      - name: feature_is_active
+        description: "True if account had any event in last 30 days. ML feature flag."
+      - name: feature_is_power_user
+        description: "True if account has more than 5 feature events. ML feature flag."
+      - name: feature_is_high_value
+        description: "True if current MRR exceeds $299. ML feature flag."
