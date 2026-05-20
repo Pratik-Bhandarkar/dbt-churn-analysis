@@ -1,0 +1,73 @@
+version: 2
+
+models:
+  - name: dim_accounts
+    description: "One row per customer account. The master dimension table enriched with activity metrics and subscription history. Primary table for account-level analysis."
+    columns:
+      - name: account_id
+        description: "Primary key."
+        tests:
+          - unique
+          - not_null
+      - name: plan_type
+        description: "Current subscription plan."
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['free', 'starter', 'pro', 'enterprise']
+      - name: current_mrr_usd
+        description: "Most recent MRR value in USD."
+      - name: effective_mrr_usd
+        description: "MRR for paid accounts. Zero for free accounts."
+      - name: account_age_days
+        description: "Days since account was created."
+
+  - name: dim_users
+    description: "One row per active user enriched with session metrics and engagement classification."
+    columns:
+      - name: user_id
+        description: "Primary key."
+        tests:
+          - unique
+          - not_null
+      - name: account_id
+        description: "Foreign key to dim_accounts."
+        tests:
+          - not_null
+          # NEW
+          - relationships:
+              arguments:
+                to: ref('dim_accounts')
+                field: account_id
+      - name: engagement_tier
+        description: "Macro-driven engagement classification based on event count."
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['high', 'medium', 'low']
+
+  - name: fct_subscriptions
+    description: "One row per subscription state change. Grain is one row per subscription event. Use for MRR analysis, churn tracking, and upgrade/downgrade funnels."
+    columns:
+      - name: subscription_id
+        description: "Primary key."
+        tests:
+          - unique
+          - not_null
+      - name: account_id
+        description: "Foreign key to dim_accounts."
+        tests:
+          - not_null
+          # NEW
+          - relationships:
+              arguments:
+                to: ref('dim_accounts')
+                field: account_id
+      - name: change_reason
+        description: "Why the subscription changed."
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['new_signup', 'upgrade', 'downgrade', 'churn']
+      - name: mrr_dollars
+        description: "MRR converted to dollars using cents_to_dollars macro."
