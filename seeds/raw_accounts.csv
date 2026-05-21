@@ -4,7 +4,7 @@ acc_002,Globex Ltd,starter,2023-02-01,UK,Finance,45
 acc_003,Initech,enterprise,2022-11-20,US,Healthcare,1200
 acc_004,Umbrella Inc,free,2023-03-10,DE,Retail,12
 acc_005,Hooli,enterprise,2022-09-05,US,Technology,5000
-acc_006,Pied Piper,starter,2023-04-22,US,Technology,28
+acc_006,Pied Piper,pro,2023-04-22,US,Technology,28
 acc_007,Massive Dynamic,pro,2023-01-30,US,Research,340
 acc_008,Vandelay Industries,free,2023-05-01,NL,Manufacturing,8
 acc_009,Dunder Mifflin,starter,2023-02-14,US,Retail,130
@@ -12,5 +12,5 @@ acc_010,Wonka Industries,pro,2023-03-28,UK,Manufacturing,420
 acc_011,Stark Industries,enterprise,2022-08-15,US,Defense,8500
 acc_012,Wayne Enterprises,enterprise,2022-10-01,US,Finance,6200
 acc_013,Cyberdyne Systems,pro,2023-04-05,US,Technology,180
-acc_014,Soylent Corp,starter,2023-05-15,US,Food,65
+acc_014,Soylent Corp,pro,2023-05-15,US,Food,65
 acc_015,Rekall Inc,free,2023-06-01,CA,Technology,5
