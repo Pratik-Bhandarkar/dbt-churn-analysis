@@ -48,6 +48,13 @@ models:
 
   - name: fct_subscriptions
     description: "One row per subscription state change. Grain is one row per subscription event. Use for MRR analysis, churn tracking, and upgrade/downgrade funnels."
+    tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "mrr_usd >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "mrr_dollars >= 0"
     columns:
       - name: subscription_id
         description: "Primary key."

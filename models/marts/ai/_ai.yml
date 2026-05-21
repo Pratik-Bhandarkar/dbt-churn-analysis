@@ -24,6 +24,10 @@ models:
 
   - name: mart_churn_risk
     description: "ML-ready feature table for churn prediction and sales prioritization. One row per account with composite risk scoring and recommended actions. Primary input for the Account Health Dashboard and LLM-generated outreach."
+    tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "composite_risk_score between 0 and 1"
     columns:
       - name: account_id
         description: "Primary key."
