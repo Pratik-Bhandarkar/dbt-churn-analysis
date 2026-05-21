@@ -1,7 +1,7 @@
 # SaaSify Analytics
 
 A production-style analytics engineering project built with dbt Core and DuckDB.
-Simulates the data stack of a B2B SaaS company — from raw event and billing data
+Simulates the data stack of a B2B SaaS company - from raw event and billing data
 through to ML-ready churn risk models.
 
 ![dbt](https://img.shields.io/badge/dbt-1.11.8-orange)
@@ -24,7 +24,7 @@ Analytics Engineer, I built a dbt pipeline that transforms raw product and
 billing data into clean, tested, analytics-ready models.
 
 The pipeline also integrates AI-generated churn and expansion scores into a
-composite risk model — the kind of work that sits at the intersection of
+composite risk model - the kind of work that sits at the intersection of
 analytics engineering and ML.
 
 ---
@@ -44,29 +44,29 @@ analytics engineering and ML.
 
 The project follows a layered architecture:
 
-**Seeds** — Five CSV files representing raw operational data: accounts, users,
+**Seeds** - Five CSV files representing raw operational data: accounts, users,
 product events, subscription changes, and ML-generated AI signals.
 
-**Staging** — One view per source. Renames columns, casts types, filters
+**Staging** - One view per source. Renames columns, casts types, filters
 deleted records, and parses JSON event properties. Nothing downstream ever
 touches raw tables directly.
 
-**Intermediate** — Two models that do the heavy lifting before marts.
+**Intermediate** - Two models that do the heavy lifting before marts.
 `int_account_activity` aggregates product events per account.
 `int_user_sessions` sessionizes user events using a 30-minute inactivity
 threshold and window functions.
 
-**Marts (Core)** — Three business-facing tables materialized as tables.
+**Marts (Core)** - Three business-facing tables materialized as tables.
 `dim_accounts` and `dim_users` are dimension tables enriched with activity
 metrics. `fct_subscriptions` is the grain-documented fact table for MRR
 and churn analysis.
 
-**Marts (AI)** — `fct_account_health` joins product signals with AI scores.
+**Marts (AI)** - `fct_account_health` joins product signals with AI scores.
 `mart_churn_risk` adds a composite risk score (weighted formula across ML
 output, inactivity, and adoption signals) and a `recommended_action` column
 that a downstream LLM can use to generate personalized sales outreach.
 
-**Snapshots** — `snp_account_plans` tracks plan changes over time using
+**Snapshots** - `snp_account_plans` tracks plan changes over time using
 SCD Type 2, enabling historical "what plan was this account on in Q2?" queries.
 
 ---
