@@ -1,0 +1,36 @@
+version: 2
+
+exposures:
+
+  - name: account_health_dashboard
+    type: dashboard
+    maturity: high
+    url: https://metabase.saasify.internal/dashboard/42
+    description: >
+      Executive dashboard showing account health, churn risk, and expansion
+      opportunities. Used daily by the Customer Success and Sales teams.
+      Refreshed every morning after the dbt pipeline runs.
+
+    depends_on:
+      - ref('mart_churn_risk')
+      - ref('fct_account_health')
+      - ref('dim_accounts')
+
+    owner:
+      name: Pratik Bhandarkar
+      email: pratik@saasify.com
+
+  - name: churn_prediction_model
+    type: ml
+    maturity: medium
+    description: >
+      Python-based churn prediction model trained on mart_churn_risk features.
+      Runs weekly retraining using the ML feature flags. Outputs are written
+      back to raw_ai_signals for the next pipeline run.
+
+    depends_on:
+      - ref('mart_churn_risk')
+
+    owner:
+      name: Pratik Bhandarkar
+      email: pratik@saasify.com
