@@ -1,0 +1,11 @@
+saasify_analytics:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: /absolute/path/to/saasify-analytics/saasify.duckdb
+      threads: 4
+    prod:
+      type: duckdb
+      path: /absolute/path/to/saasify-analytics/saasify_prod.duckdb
+      threads: 4
