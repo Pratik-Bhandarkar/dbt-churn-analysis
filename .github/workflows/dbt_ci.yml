@@ -1,0 +1,48 @@
+name: dbt CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  dbt-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dbt-duckdb
+        run: pip install dbt-duckdb dbt-utils
+
+      - name: Create profiles.yml
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << 'EOF'
+          saasify_analytics:
+            target: dev
+            outputs:
+              dev:
+                type: duckdb
+                path: /home/runner/work/saasify-analytics/saasify-analytics/saasify.duckdb
+                threads: 4
+          EOF
+
+      - name: Install dbt packages
+        run: dbt deps
+
+      - name: Load seed data
+        run: dbt seed
+
+      - name: Run models
+        run: dbt run
+
+      - name: Run tests
+        run: dbt test
