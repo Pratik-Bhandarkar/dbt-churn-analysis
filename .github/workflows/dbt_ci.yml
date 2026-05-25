@@ -31,7 +31,7 @@ jobs:
             outputs:
               dev:
                 type: duckdb
-                path: /home/runner/work/saasify-analytics/saasify-analytics/saasify.duckdb
+                path: saasify.duckdb
                 threads: 4
           EOF
 
