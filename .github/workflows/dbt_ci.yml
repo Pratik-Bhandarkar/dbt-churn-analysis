@@ -20,7 +20,7 @@ jobs:
           python-version: '3.10'
 
       - name: Install dbt-duckdb
-        run: pip install dbt-duckdb dbt-utils
+        run: pip install dbt-duckdb
 
       - name: Create profiles.yml
         run: |
